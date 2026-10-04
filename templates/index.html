@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduGenie - AI Learning Assistant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+  <!-- Marked.js for markdown rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Sidebar / Navigation -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">✨</div>
+        <div class="brand-info">
+          <h1>EduGenie</h1>
+          <span class="brand-badge">AI Assistant</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <button class="nav-tab active" data-tab="tab-qa">
+          <span class="icon">💬</span>
+          <div class="tab-meta">
+            <span class="title">Ask Questions</span>
+            <span class="desc">Academic Q&amp;A helper</span>
+          </div>
+        </button>
+
+        <button class="nav-tab" data-tab="tab-explain">
+          <span class="icon">💡</span>
+          <div class="tab-meta">
+            <span class="title">Concept Explainer</span>
+            <span class="desc">Intuitive breakdown</span>
+          </div>
+        </button>
+
+        <button class="nav-tab" data-tab="tab-quiz">
+          <span class="icon">📝</span>
+          <div class="tab-meta">
+            <span class="title">Quiz Generator</span>
+            <span class="desc">Interactive 3-question test</span>
+          </div>
+        </button>
+
+        <button class="nav-tab" data-tab="tab-summarize">
+          <span class="icon">📑</span>
+          <div class="tab-meta">
+            <span class="title">Summarizer</span>
+            <span class="desc">Quick revision notes</span>
+          </div>
+        </button>
+
+        <button class="nav-tab" data-tab="tab-learn">
+          <span class="icon">🚀</span>
+          <div class="tab-meta">
+            <span class="title">Learning Path</span>
+            <span class="desc">Structured roadmap</span>
+          </div>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="server-status" id="server-status">
+          <span class="status-dot"></span>
+          <span class="status-text">Checking server...</span>
+        </div>
+        <div class="engine-info">
+          <span>Engine: Google Gemini</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Top Bar -->
+      <header class="topbar">
+        <div class="header-titles">
+          <h2 id="section-title">Academic Q&amp;A Assistant</h2>
+          <p id="section-desc">Ask any academic question and receive an accurate, step-by-step educational answer.</p>
+        </div>
+      </header>
+
+      <!-- Panel Container -->
+      <div class="panel-container">
+        
+        <!-- Tab 1: Q&A -->
+        <section class="tab-panel active" id="tab-qa">
+          <div class="panel-grid">
+            <div class="input-card">
+              <div class="card-header">
+                <h3>Enter Your Question</h3>
+                <span class="badge">Q&amp;A Module</span>
+              </div>
+              <p class="quick-title">Quick Examples:</p>
+              <div class="sample-chips">
+                <button class="chip" onclick="fillInput('qa-input', 'Why is the sky blue during the day and red at sunset?')">Why is the sky blue?</button>
+                <button class="chip" onclick="fillInput('qa-input', 'Explain the difference between mitosis and meiosis.')">Mitosis vs Meiosis</button>
+                <button class="chip" onclick="fillInput('qa-input', 'What is Heisenberg Uncertainty Principle in simple terms?')">Uncertainty Principle</button>
+              </div>
+              <textarea id="qa-input" placeholder="Type your academic or conceptual question here..." rows="6"></textarea>
+              <div class="action-row">
+                <span class="char-count" id="qa-count">0 chars</span>
+                <div class="btn-group">
+                  <button class="btn btn-secondary" onclick="clearField('qa-input', 'qa-output')">Clear</button>
+                  <button class="btn btn-primary" id="qa-btn" onclick="submitQA()">
+                    <span class="btn-text">Get Answer</span>
+                    <span class="btn-spinner hidden"></span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="output-card">
+              <div class="card-header">
+                <h3>EduGenie's Explanation</h3>
+                <button class="btn-copy" onclick="copyResult('qa-output')" title="Copy to clipboard">📋 Copy</button>
+              </div>
+              <div class="output-body" id="qa-output">
+                <div class="empty-state">
+                  <span class="empty-icon">💭</span>
+                  <p>Your answer will appear here once submitted.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tab 2: Concept Explainer -->
+        <section class="tab-panel" id="tab-explain">
+          <div class="panel-grid">
+            <div class="input-card">
+              <div class="card-header">
+                <h3>Topic or Concept</h3>
+                <span class="badge">Explainer Module</span>
+              </div>
+              <p class="quick-title">Quick Examples:</p>
+              <div class="sample-chips">
+                <button class="chip" onclick="fillInput('explain-input', 'Blockchain and distributed ledgers')">Blockchain</button>
+                <button class="chip" onclick="fillInput('explain-input', 'Photosynthesis in plants')">Photosynthesis</button>
+                <button class="chip" onclick="fillInput('explain-input', 'Quantum Computing qubits')">Quantum Qubits</button>
+              </div>
+              <textarea id="explain-input" placeholder="Enter a concept, term, or topic you want explained simply..." rows="6"></textarea>
+              <div class="action-row">
+                <span class="char-count" id="explain-count">0 chars</span>
+                <div class="btn-group">
+                  <button class="btn btn-secondary" onclick="clearField('explain-input', 'explain-output')">Clear</button>
+                  <button class="btn btn-primary" id="explain-btn" onclick="submitExplain()">
+                    <span class="btn-text">Explain Simply</span>
+                    <span class="btn-spinner hidden"></span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="output-card">
+              <div class="card-header">
+                <h3>Structured Breakdown</h3>
+                <button class="btn-copy" onclick="copyResult('explain-output')" title="Copy to clipboard">📋 Copy</button>
+              </div>
+              <div class="output-body" id="explain-output">
+                <div class="empty-state">
+                  <span class="empty-icon">💡</span>
+                  <p>A simple definition, key takeaways, and real-world examples will show here.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tab 3: Quiz Generator -->
+        <section class="tab-panel" id="tab-quiz">
+          <div class="panel-grid">
+            <div class="input-card">
+              <div class="card-header">
+                <h3>Study Material / Topic</h3>
+                <span class="badge">Quiz Module</span>
+              </div>
+              <p class="quick-title">Quick Examples:</p>
+              <div class="sample-chips">
+                <button class="chip" onclick="fillInput('quiz-input', 'Photosynthesis is the process by which green plants and certain other organisms transform light energy into chemical energy. During photosynthesis in green plants, light energy is captured and used to convert water, carbon dioxide, and minerals into oxygen and energy-rich organic compounds.')">Photosynthesis Paragraph</button>
+                <button class="chip" onclick="fillInput('quiz-input', 'The solar system consists of the Sun and everything bound to it by gravity: eight planets (Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune), dwarf planets such as Pluto, dozens of moons, and millions of asteroids and comets.')">Solar System Basics</button>
+              </div>
+              <textarea id="quiz-input" placeholder="Paste study text, notes, or a subject to generate a test..." rows="6"></textarea>
+              <div class="action-row">
+                <span class="char-count" id="quiz-count">0 chars</span>
+                <div class="btn-group">
+                  <button class="btn btn-secondary" onclick="clearField('quiz-input', 'quiz-output')">Clear</button>
+                  <button class="btn btn-primary" id="quiz-btn" onclick="submitQuiz()">
+                    <span class="btn-text">Generate Quiz</span>
+                    <span class="btn-spinner hidden"></span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="output-card">
+              <div class="card-header">
+                <h3>Interactive Quiz</h3>
+                <div id="quiz-score-badge" class="score-badge hidden">Score: 0/3</div>
+              </div>
+              <div class="output-body" id="quiz-output">
+                <div class="empty-state">
+                  <span class="empty-icon">📝</span>
+                  <p>Generate a quiz from any text to test your comprehension with interactive multiple choice questions.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tab 4: Summarizer -->
+        <section class="tab-panel" id="tab-summarize">
+          <div class="panel-grid">
+            <div class="input-card">
+              <div class="card-header">
+                <h3>Passage to Summarize</h3>
+                <span class="badge">Summarizer Module</span>
+              </div>
+              <p class="quick-title">Quick Examples:</p>
+              <div class="sample-chips">
+                <button class="chip" onclick="fillInput('summarize-input', 'Machine learning is a branch of artificial intelligence and computer science which focuses on the use of data and algorithms to enable AI to imitate the way that humans learn, gradually improving its accuracy. Over the last couple of decades, technological advances in storage and processing power have enabled some innovative products based on machine learning, such as Netflix recommendation engines and self-driving cars.')">Machine Learning Intro</button>
+                <button class="chip" onclick="fillInput('summarize-input', 'Renewable energy is energy derived from natural resources that replenish themselves in less than a human lifetime without depleting the planet resources. These resources, such as sunlight, wind, rain, tides, waves, and geothermal heat, stand in contrast to fossil fuels, which are being used far more quickly than they are being replenished.')">Renewable Energy</button>
+              </div>
+              <textarea id="summarize-input" placeholder="Paste textbook excerpts, articles, or notes here..." rows="6"></textarea>
+              <div class="action-row">
+                <span class="char-count" id="summarize-count">0 chars</span>
+                <div class="btn-group">
+                  <button class="btn btn-secondary" onclick="clearField('summarize-input', 'summarize-output')">Clear</button>
+                  <button class="btn btn-primary" id="summarize-btn" onclick="submitSummarize()">
+                    <span class="btn-text">Summarize Text</span>
+                    <span class="btn-spinner hidden"></span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="output-card">
+              <div class="card-header">
+                <h3>Concise Summary</h3>
+                <button class="btn-copy" onclick="copyResult('summarize-output')" title="Copy to clipboard">📋 Copy</button>
+              </div>
+              <div class="output-body" id="summarize-output">
+                <div class="empty-state">
+                  <span class="empty-icon">📑</span>
+                  <p>Your revision-ready summary will be displayed here.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tab 5: Learning Path -->
+        <section class="tab-panel" id="tab-learn">
+          <div class="panel-grid">
+            <div class="input-card">
+              <div class="card-header">
+                <h3>Topic or Skill</h3>
+                <span class="badge">Roadmap Module</span>
+              </div>
+              <p class="quick-title">Quick Examples:</p>
+              <div class="sample-chips">
+                <button class="chip" onclick="fillInput('learn-input', 'Full Stack Web Development with React and Python')">Web Development</button>
+                <button class="chip" onclick="fillInput('learn-input', 'Data Science & Machine Learning from Scratch')">Data Science</button>
+                <button class="chip" onclick="fillInput('learn-input', 'Cybersecurity & Ethical Hacking')">Cybersecurity</button>
+              </div>
+              <textarea id="learn-input" placeholder="Enter any subject, career path, or programming language..." rows="6"></textarea>
+              <div class="action-row">
+                <span class="char-count" id="learn-count">0 chars</span>
+                <div class="btn-group">
+                  <button class="btn btn-secondary" onclick="clearField('learn-input', 'learn-output')">Clear</button>
+                  <button class="btn btn-primary" id="learn-btn" onclick="submitLearn()">
+                    <span class="btn-text">Generate Roadmap</span>
+                    <span class="btn-spinner hidden"></span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="output-card">
+              <div class="card-header">
+                <h3>Tailored Learning Pathway</h3>
+                <button class="btn-copy" onclick="copyResult('learn-output')" title="Copy to clipboard">📋 Copy</button>
+              </div>
+              <div class="output-body" id="learn-output">
+                <div class="empty-state">
+                  <span class="empty-icon">🚀</span>
+                  <p>A comprehensive step-by-step roadmap with milestones, exercises, and timelines will appear here.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Tab switching logic
+    const tabs = document.querySelectorAll('.nav-tab');
+    const panels = document.querySelectorAll('.tab-panel');
+    const secTitle = document.getElementById('section-title');
+    const secDesc = document.getElementById('section-desc');
+
+    const meta = {
+      'tab-qa': {
+        title: 'Academic Q&A Assistant',
+        desc: 'Ask any academic question and receive an accurate, step-by-step educational answer.'
+      },
+      'tab-explain': {
+        title: 'Concept Explainer',
+        desc: 'Break down complex topics into beginner-friendly definitions, core points, and simple examples.'
+      },
+      'tab-quiz': {
+        title: 'Interactive Quiz Generator',
+        desc: 'Transform study passages into a 3-question multiple choice test with automated grading and explanations.'
+      },
+      'tab-summarize': {
+        title: 'Passage Summarizer',
+        desc: 'Extract key ideas and essential terminology into a concise, revision-ready summary.'
+      },
+      'tab-learn': {
+        title: 'Personalized Learning Roadmap',
+        desc: 'Generate an end-to-end curriculum complete with prerequisites, milestones, projects, and timelines.'
+      }
+    };
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        panels.forEach(p => p.classList.remove('active'));
+
+        tab.classList.add('active');
+        const targetId = tab.getAttribute('data-tab');
+        document.getElementById(targetId).classList.add('active');
+
+        if (meta[targetId]) {
+          secTitle.textContent = meta[targetId].title;
+          secDesc.textContent = meta[targetId].desc;
+        }
+      });
+    });
+
+    // Helper functions
+    function fillInput(id, text) {
+      const el = document.getElementById(id);
+      el.value = text;
+      el.dispatchEvent(new Event('input'));
+    }
+
+    function clearField(inputId, outputId) {
+      const input = document.getElementById(inputId);
+      input.value = '';
+      input.dispatchEvent(new Event('input'));
+    }
+
+    // Char counters
+    ['qa', 'explain', 'quiz', 'summarize', 'learn'].forEach(prefix => {
+      const input = document.getElementById(`${prefix}-input`);
+      const count = document.getElementById(`${prefix}-count`);
+      if (input && count) {
+        input.addEventListener('input', () => {
+          count.textContent = `${input.value.length} chars`;
+        });
+      }
+    });
+
+    // Copy to clipboard
+    function copyResult(outputId) {
+      const out = document.getElementById(outputId);
+      if (!out) return;
+      navigator.clipboard.writeText(out.innerText || out.textContent).then(() => {
+        const btn = out.parentElement.querySelector('.btn-copy');
+        if (btn) {
+          const orig = btn.innerHTML;
+          btn.innerHTML = '✅ Copied!';
+          setTimeout(() => { btn.innerHTML = orig; }, 1800);
+        }
+      });
+    }
+
+    // Server health status check
+    async function checkHealth() {
+      const statusEl = document.getElementById('server-status');
+      try {
+        const res = await fetch('/health');
+        if (res.ok) {
+          const data = await res.json();
+          statusEl.innerHTML = `<span class="status-dot online"></span><span class="status-text">${data.service} Online</span>`;
+        } else {
+          statusEl.innerHTML = `<span class="status-dot error"></span><span class="status-text">Server Error</span>`;
+        }
+      } catch (e) {
+        statusEl.innerHTML = `<span class="status-dot error"></span><span class="status-text">Disconnected</span>`;
+      }
+    }
+    checkHealth();
+    setInterval(checkHealth, 30000);
+
+    // API submission utilities
+    function setLoading(btnId, isLoading) {
+      const btn = document.getElementById(btnId);
+      const spinner = btn.querySelector('.btn-spinner');
+      const text = btn.querySelector('.btn-text');
+      btn.disabled = isLoading;
+      if (isLoading) {
+        spinner.classList.remove('hidden');
+        text.style.opacity = '0.5';
+      } else {
+        spinner.classList.add('hidden');
+        text.style.opacity = '1';
+      }
+    }
+
+    function renderMarkdown(content) {
+      if (window.marked && typeof window.marked.parse === 'function') {
+        return window.marked.parse(content);
+      }
+      return content.replace(/\n/g, '<br>');
+    }
+
+    // Submit QA
+    async function submitQA() {
+      const input = document.getElementById('qa-input').value.trim();
+      const output = document.getElementById('qa-output');
+      if (!input) {
+        output.innerHTML = '<div class="error-banner">Please enter a question to get an answer.</div>';
+        return;
+      }
+      setLoading('qa-btn', true);
+      output.innerHTML = '<div class="loading-state"><span class="loading-spinner"></span><p>Consulting EduGenie knowledge base...</p></div>';
+
+      try {
+        const res = await fetch('/qa', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question: input })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          output.innerHTML = `<div class="markdown-body">${renderMarkdown(data.answer)}</div>`;
+        } else {
+          output.innerHTML = `<div class="error-banner">Error: ${data.detail || 'Could not fetch answer'}</div>`;
+        }
+      } catch (err) {
+        output.innerHTML = `<div class="error-banner">Network error: ${err.message}</div>`;
+      } finally {
+        setLoading('qa-btn', false);
+      }
+    }
+
+    // Submit Explanation
+    async function submitExplain() {
+      const input = document.getElementById('explain-input').value.trim();
+      const output = document.getElementById('explain-output');
+      if (!input) {
+        output.innerHTML = '<div class="error-banner">Please enter a concept or topic.</div>';
+        return;
+      }
+      setLoading('explain-btn', true);
+      output.innerHTML = '<div class="loading-state"><span class="loading-spinner"></span><p>Crafting beginner-friendly explanation...</p></div>';
+
+      try {
+        const res = await fetch('/explain', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: input })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          output.innerHTML = `<div class="markdown-body">${renderMarkdown(data.explanation)}</div>`;
+        } else {
+          output.innerHTML = `<div class="error-banner">Error: ${data.detail || 'Could not generate explanation'}</div>`;
+        }
+      } catch (err) {
+        output.innerHTML = `<div class="error-banner">Network error: ${err.message}</div>`;
+      } finally {
+        setLoading('explain-btn', false);
+      }
+    }
+
+    // Submit Quiz
+    let currentQuiz = null;
+    let userAnswers = {};
+
+    async function submitQuiz() {
+      const input = document.getElementById('quiz-input').value.trim();
+      const output = document.getElementById('quiz-output');
+      const scoreBadge = document.getElementById('quiz-score-badge');
+      if (!input) {
+        output.innerHTML = '<div class="error-banner">Please enter study material or a topic to generate a quiz.</div>';
+        return;
+      }
+      setLoading('quiz-btn', true);
+      scoreBadge.classList.add('hidden');
+      output.innerHTML = '<div class="loading-state"><span class="loading-spinner"></span><p>Generating 3 interactive questions from your material...</p></div>';
+
+      try {
+        const res = await fetch('/quiz', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: input })
+        });
+        const data = await res.json();
+        if (res.ok && data.questions && data.questions.length) {
+          currentQuiz = data.questions;
+          userAnswers = {};
+          renderInteractiveQuiz(data.questions);
+        } else {
+          output.innerHTML = `<div class="error-banner">Error: ${data.detail || 'Failed to generate valid quiz questions'}</div>`;
+        }
+      } catch (err) {
+        output.innerHTML = `<div class="error-banner">Network error: ${err.message}</div>`;
+      } finally {
+        setLoading('quiz-btn', false);
+      }
+    }
+
+    function renderInteractiveQuiz(questions) {
+      const output = document.getElementById('quiz-output');
+      let html = '<div class="quiz-container">';
+
+      questions.forEach((q, qIndex) => {
+        html += `
+          <div class="quiz-card" id="qcard-${qIndex}">
+            <div class="question-header">
+              <span class="q-number">Question ${qIndex + 1} of ${questions.length}</span>
+              <h4 class="q-text">${escapeHtml(q.question)}</h4>
+            </div>
+            <div class="options-list">
+              ${q.options.map((opt, optIndex) => `
+                <button type="button" class="opt-btn" onclick="selectQuizOption(${qIndex}, '${escapeAttr(opt)}', this)">
+                  <span class="opt-letter">${String.fromCharCode(65 + optIndex)}</span>
+                  <span class="opt-text">${escapeHtml(opt)}</span>
+                </button>
+              `).join('')}
+            </div>
+            <div class="q-explanation hidden" id="qexp-${qIndex}">
+              <div class="exp-title">💡 Explanation:</div>
+              <div class="exp-body">${escapeHtml(q.explanation)}</div>
+            </div>
+          </div>
+        `;
+      });
+
+      html += `
+        <div class="quiz-actions">
+          <button class="btn btn-primary" id="btn-submit-quiz" onclick="evaluateQuiz()">Submit & Check Score</button>
+        </div>
+      </div>`;
+
+      output.innerHTML = html;
+    }
+
+    function selectQuizOption(qIndex, optionVal, btnElement) {
+      userAnswers[qIndex] = optionVal;
+      const card = document.getElementById(`qcard-${qIndex}`);
+      const btns = card.querySelectorAll('.opt-btn');
+      btns.forEach(b => b.classList.remove('selected'));
+      btnElement.classList.add('selected');
+    }
+
+    function evaluateQuiz() {
+      if (!currentQuiz) return;
+      let score = 0;
+      const total = currentQuiz.length;
+
+      currentQuiz.forEach((q, qIndex) => {
+        const card = document.getElementById(`qcard-${qIndex}`);
+        const exp = document.getElementById(`qexp-${qIndex}`);
+        const btns = card.querySelectorAll('.opt-btn');
+        const userChoice = userAnswers[qIndex];
+
+        btns.forEach(b => {
+          b.disabled = true;
+          const text = b.querySelector('.opt-text').textContent.trim();
+          if (text === q.correct_answer) {
+            b.classList.add('correct');
+          } else if (text === userChoice) {
+            b.classList.add('incorrect');
+          }
+        });
+
+        if (userChoice === q.correct_answer) {
+          score++;
+        }
+        exp.classList.remove('hidden');
+      });
+
+      const scoreBadge = document.getElementById('quiz-score-badge');
+      scoreBadge.textContent = `Score: ${score} / ${total} (${Math.round((score/total)*100)}%)`;
+      scoreBadge.classList.remove('hidden');
+      scoreBadge.className = score === total ? 'score-badge success' : (score > 0 ? 'score-badge warning' : 'score-badge fail');
+
+      const submitBtn = document.getElementById('btn-submit-quiz');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Quiz Completed';
+      }
+    }
+
+    // Submit Summarize
+    async function submitSummarize() {
+      const input = document.getElementById('summarize-input').value.trim();
+      const output = document.getElementById('summarize-output');
+      if (!input) {
+        output.innerHTML = '<div class="error-banner">Please enter a passage to summarize.</div>';
+        return;
+      }
+      setLoading('summarize-btn', true);
+      output.innerHTML = '<div class="loading-state"><span class="loading-spinner"></span><p>Synthesizing key points and concepts...</p></div>';
+
+      try {
+        const res = await fetch('/summarize', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: input })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          output.innerHTML = `<div class="markdown-body">${renderMarkdown(data.summary)}</div>`;
+        } else {
+          output.innerHTML = `<div class="error-banner">Error: ${data.detail || 'Could not generate summary'}</div>`;
+        }
+      } catch (err) {
+        output.innerHTML = `<div class="error-banner">Network error: ${err.message}</div>`;
+      } finally {
+        setLoading('summarize-btn', false);
+      }
+    }
+
+    // Submit Learning Path
+    async function submitLearn() {
+      const input = document.getElementById('learn-input').value.trim();
+      const output = document.getElementById('learn-output');
+      if (!input) {
+        output.innerHTML = '<div class="error-banner">Please enter a topic or discipline.</div>';
+        return;
+      }
+      setLoading('learn-btn', true);
+      output.innerHTML = '<div class="loading-state"><span class="loading-spinner"></span><p>Designing custom curriculum roadmap...</p></div>';
+
+      try {
+        const res = await fetch('/learn/recommendations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: input })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          output.innerHTML = `<div class="markdown-body">${renderMarkdown(data.recommendations)}</div>`;
+        } else {
+          output.innerHTML = `<div class="error-banner">Error: ${data.detail || 'Could not build learning roadmap'}</div>`;
+        }
+      } catch (err) {
+        output.innerHTML = `<div class="error-banner">Network error: ${err.message}</div>`;
+      } finally {
+        setLoading('learn-btn', false);
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function escapeAttr(str) {
+      if (!str) return '';
+      return String(str).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    }
+  </script>
+</body>
+</html>
